@@ -1,17 +1,9 @@
--- Создаём схему project
-CREATE SCHEMA IF NOT EXISTS mipt_project;
+-- Пересоздаём схему mipt_project
+DROP SCHEMA IF EXISTS mipt_project CASCADE;
+CREATE SCHEMA mipt_project;
 
 -- Устанавливаем search_path, чтобы использовать схему project
 SET search_path TO mipt_project;
-
--- Удаляем таблицы, если они уже существуют
-DROP TABLE IF EXISTS playlist_tracks;
-DROP TABLE IF EXISTS playlists;
-DROP TABLE IF EXISTS tracks;
-DROP TABLE IF EXISTS albums;
-DROP TABLE IF EXISTS artists;
-DROP TABLE IF EXISTS genres;
-DROP TABLE IF EXISTS users;
 
 -- Таблица пользователей
 CREATE TABLE IF NOT EXISTS users
@@ -67,13 +59,20 @@ CREATE TABLE IF NOT EXISTS tracks
 (
     id           SERIAL PRIMARY KEY,
     album_id     INTEGER      NOT NULL REFERENCES albums (id) ON DELETE CASCADE,
-    genre_id     INTEGER      REFERENCES genres (id) ON DELETE SET NULL,
     title        VARCHAR(255) NOT NULL,
     duration     INTEGER NOT NULL CHECK ( duration > 0 ), -- продолжительность в секундах
     track_number INTEGER NOT NULL,
     track_url    TEXT NOT NULL,    -- ссылка на аудиофайл для подгрузки
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_track_number_per_album UNIQUE (album_id, track_number)
+);
+
+-- Вспомогательная таблица для связи треков и жанров (многие ко многим)
+CREATE TABLE IF NOT EXISTS track_genres
+(
+    track_id    INTEGER NOT NULL REFERENCES tracks (id) ON DELETE CASCADE,
+    genre_id    INTEGER NOT NULL REFERENCES genres (id) ON DELETE CASCADE,
+    PRIMARY KEY (track_id, genre_id)
 );
 
 -- Вспомогательная таблица для связи плейлистов и треков (многие ко многим)
