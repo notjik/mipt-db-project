@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS albums
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица треков
+
+-- Таблица плейлистов
 CREATE TABLE IF NOT EXISTS playlists
 (
     id          SERIAL PRIMARY KEY,
@@ -61,7 +62,7 @@ CREATE TABLE IF NOT EXISTS playlists
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица плейлистов
+-- Таблица треков
 CREATE TABLE IF NOT EXISTS tracks
 (
     id           SERIAL PRIMARY KEY,
