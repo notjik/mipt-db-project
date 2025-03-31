@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS albums
     id           SERIAL PRIMARY KEY,
     artist_id    INTEGER      NOT NULL REFERENCES artists (id) ON DELETE CASCADE,
     title        VARCHAR(255) NOT NULL,
-    release_date DATE,
+    release_date DATE DEFAULT CURRENT_DATE,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -69,9 +69,9 @@ CREATE TABLE IF NOT EXISTS tracks
     album_id     INTEGER      NOT NULL REFERENCES albums (id) ON DELETE CASCADE,
     genre_id     INTEGER      REFERENCES genres (id) ON DELETE SET NULL,
     title        VARCHAR(255) NOT NULL,
-    duration     INTEGER, -- продолжительность в секундах
-    track_number INTEGER,
-    track_url    TEXT,    -- ссылка на аудиофайл для подгрузки
+    duration     INTEGER NOT NULL CHECK ( duration > 0 ), -- продолжительность в секундах
+    track_number INTEGER NOT NULL,
+    track_url    TEXT NOT NULL,    -- ссылка на аудиофайл для подгрузки
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_track_number_per_album UNIQUE (album_id, track_number)
 );
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS playlist_tracks
 (
     playlist_id INTEGER NOT NULL REFERENCES playlists (id) ON DELETE CASCADE,
     track_id    INTEGER NOT NULL REFERENCES tracks (id) ON DELETE CASCADE,
-    position    INTEGER, -- порядок трека в плейлисте
+    position    INTEGER NOT NULL CHECK ( position > 0 ), -- порядок трека в плейлисте
     PRIMARY KEY (playlist_id, track_id),
     CONSTRAINT unique_track_position_per_playlist UNIQUE (playlist_id, position)
 );
