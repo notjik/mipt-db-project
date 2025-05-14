@@ -119,9 +119,17 @@
 
 ## Скрипты
 
-### [ddl.sql](scripts/ddl.sql)
+#### [ddl.sql](scripts/ddl.sql)
 
-### [ddl.sql](scripts/dml.sql)
+#### [triggers.sql](scripts/triggers.sql)
 
-### [examples](scripts/examples)
+#### [functions.sql](scripts/functions.sql)
+
+#### [triggers.sql](scripts/triggers.sql)
+
+#### [dml.sql](scripts/dml.sql)
+
+#### [25 examples in PLpgSQL](scripts/examples)
+
+#### [Data Analysis](scripts/examples)
 
