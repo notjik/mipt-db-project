@@ -21,7 +21,20 @@ BEGIN
 END;
 $$;
 
--- 2. Функция: Средняя длительность треков артиста
+-- 2. Процедура: Добавления трека в историю прослушивания
+CREATE OR REPLACE PROCEDURE mipt_project.listen_track(
+    IN p_user_id INTEGER,
+    IN p_track_id INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    INSERT INTO mipt_project.listened_tracks (user_id, track_id)
+    VALUES (p_user_id, p_track_id);
+END;
+$$;
+
+-- 3. Функция: Средняя длительность треков артиста
 CREATE OR REPLACE FUNCTION mipt_project.get_avg_track_duration_by_artist(
     p_artist_id INT
 ) RETURNS NUMERIC AS $$
@@ -36,7 +49,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 3. Табличная функция: Список треков по жанру
+-- 4. Табличная функция: Список треков по жанру
 CREATE OR REPLACE FUNCTION mipt_project.get_tracks_by_genre(
     p_genre VARCHAR
 ) RETURNS TABLE(

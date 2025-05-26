@@ -1,8 +1,5 @@
--- Устанавливаем search_path, чтобы использовать схему project
-SET search_path TO mipt_project;
-
 -- Триггеры для основных таблиц
-CREATE OR REPLACE FUNCTION log_entity_history() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION mipt_project.log_entity_history() RETURNS TRIGGER AS $$
 BEGIN
     IF TG_TABLE_NAME = 'users' THEN
         INSERT INTO mipt_project.users_history (
@@ -77,7 +74,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Триггеры для связующих таблиц
-CREATE OR REPLACE FUNCTION log_relation_history() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION mipt_project.log_relation_history() RETURNS TRIGGER AS $$
 BEGIN
     IF TG_TABLE_NAME = 'track_genres' THEN
         INSERT INTO mipt_project.track_genres_history (
