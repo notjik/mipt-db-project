@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS mipt_project.albums
     id           SERIAL PRIMARY KEY,
     artist_id    INTEGER      NOT NULL REFERENCES mipt_project.artists (id) ON DELETE CASCADE,
     title        VARCHAR(255) NOT NULL,
-    release_date DATE DEFAULT CURRENT_DATE,
+    release_date DATE      DEFAULT CURRENT_DATE,
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -56,9 +56,9 @@ CREATE TABLE IF NOT EXISTS mipt_project.tracks
     id           SERIAL PRIMARY KEY,
     album_id     INTEGER      NOT NULL REFERENCES mipt_project.albums (id) ON DELETE CASCADE,
     title        VARCHAR(255) NOT NULL,
-    duration     INTEGER NOT NULL CHECK ( duration > 0 ), -- продолжительность в секундах
-    track_number INTEGER NOT NULL,
-    track_url    TEXT NOT NULL,    -- ссылка на аудиофайл для подгрузки
+    duration     INTEGER      NOT NULL CHECK ( duration > 0 ), -- продолжительность в секундах
+    track_number INTEGER      NOT NULL,
+    track_url    TEXT         NOT NULL,                        -- ссылка на аудиофайл для подгрузки
     created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_track_number_per_album UNIQUE (album_id, track_number)
 );
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS mipt_project.tracks
 -- Вспомогательная таблица для связи треков и жанров (многие ко многим)
 CREATE TABLE IF NOT EXISTS mipt_project.track_genres
 (
-    track_id    INTEGER NOT NULL REFERENCES mipt_project.tracks (id) ON DELETE CASCADE,
-    genre_id    INTEGER NOT NULL REFERENCES mipt_project.genres (id) ON DELETE CASCADE,
+    track_id INTEGER NOT NULL REFERENCES mipt_project.tracks (id) ON DELETE CASCADE,
+    genre_id INTEGER NOT NULL REFERENCES mipt_project.genres (id) ON DELETE CASCADE,
     PRIMARY KEY (track_id, genre_id)
 );
 
@@ -81,10 +81,11 @@ CREATE TABLE IF NOT EXISTS mipt_project.playlist_tracks
     CONSTRAINT unique_track_position_per_playlist UNIQUE (playlist_id, position)
 );
 
--- Вспомогательная таблица с историей прослушивания треков (многие-ко-многим)
-CREATE TABLE mipt_project.listened_tracks (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES mipt_project.users(id) ON DELETE CASCADE,
-    track_id INTEGER NOT NULL REFERENCES mipt_project.tracks(id) ON DELETE CASCADE,
+-- Таблица с историей прослушивания треков (многие-ко-многим)
+CREATE TABLE mipt_project.listened_tracks
+(
+    id          SERIAL PRIMARY KEY,
+    user_id     INTEGER   NOT NULL REFERENCES mipt_project.users (id) ON DELETE CASCADE,
+    track_id    INTEGER   NOT NULL REFERENCES mipt_project.tracks (id) ON DELETE CASCADE,
     listened_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

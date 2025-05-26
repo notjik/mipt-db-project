@@ -29,6 +29,12 @@ CREATE OR REPLACE PROCEDURE mipt_project.listen_track(
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    IF NOT EXISTS (SELECT 1 FROM mipt_project.users WHERE id = p_user_id) THEN
+        RAISE EXCEPTION 'Пользователь с ID % не найден', p_user_id;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM mipt_project.tracks WHERE id = p_track_id) THEN
+        RAISE EXCEPTION 'Трек с ID % не найден', p_track_id;
+    END IF;
     INSERT INTO mipt_project.listened_tracks (user_id, track_id)
     VALUES (p_user_id, p_track_id);
 END;
@@ -73,3 +79,51 @@ BEGIN
     WHERE g.name = p_genre;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- 5. Табличная функция: Поиск треков по названию
+CREATE OR REPLACE FUNCTION mipt_project.search_tracks_by_title(
+    p_search_query TEXT,
+    p_limit INTEGER DEFAULT 20,
+    p_offset INTEGER DEFAULT 0
+)
+    RETURNS TABLE(
+                     track_id INTEGER,
+                     track_title VARCHAR(255),
+                     artist_name VARCHAR(255),
+                     album_title VARCHAR(255),
+                     duration INTEGER,
+                     track_url TEXT,
+                     relevance_score REAL
+                 )
+    LANGUAGE plpgsql AS $$
+BEGIN
+    IF p_search_query IS NULL OR trim(p_search_query) = '' THEN
+        RAISE EXCEPTION 'Поисковый запрос не может быть пустым';
+    END IF;
+
+    RETURN QUERY
+        SELECT
+            t.id as track_id,
+            t.title as track_title,
+            ar.name as artist_name,
+            a.title as album_title,
+            t.duration,
+            t.track_url,
+            ts_rank(
+                    to_tsvector('russian', t.title),
+                    to_tsquery('russian', p_search_query)
+            ) as relevance_score
+        FROM mipt_project.tracks t
+                 JOIN mipt_project.albums a ON t.album_id = a.id
+                 JOIN mipt_project.artists ar ON a.artist_id = ar.id
+        WHERE to_tsvector('russian', t.title) @@ to_tsquery('russian', p_search_query)
+        ORDER BY relevance_score DESC, t.title
+        LIMIT p_limit
+            OFFSET p_offset;
+
+    IF p_limit <= 0 OR p_limit > 100 THEN
+        RAISE EXCEPTION 'Лимит должен быть от 1 до 100';
+    END IF;
+END;
+$$;
