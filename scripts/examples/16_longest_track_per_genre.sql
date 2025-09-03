@@ -8,4 +8,4 @@ SELECT
 FROM track_genres tg
          JOIN genres g ON tg.genre_id = g.id
          JOIN tracks t ON tg.track_id = t.id
-ORDER BY g.name, rank_within_genre;
+ORDER BY rank_within_genre, g.name, t.title;
